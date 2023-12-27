@@ -1,0 +1,30 @@
+name: Build on Linux
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: fedora:rawhide
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install dependencies
+        run: |
+          dnf install -y dnf5
+          dnf5 install -y gcc-c++ cmake \
+            elfutils-devel libdwarf-devel elfutils-libelf-devel \
+            doxygen jsoncpp-devel capstone-devel json-c-devel \
+            qt5-qtbase-devel qt5-linguist qt5-qtscript-devel \
+            dtkwidget-devel lxqt-build-tools kf5-syntax-highlighting-devel dbus-devel \
+            clang-devel llvm-devel libunwind-devel libXi-devel
+
+      - name: build
+        run: |
+          cmake . -B build
+          cmake --build build -j$(nproc)
